@@ -67,28 +67,39 @@ class Jni
 		
 		if (Context.defined("android"))
 		{
+			#if debug
+			trace($v{jniPackage} + " :: " + $v{jniPrimitive} + ' :: signature ' + $v{jniSignature});
+			#end 
+			
 			func.expr = macro
 			{
-				if ($i{fieldName} == null)
+				try
 				{
-					#if verbose_mirrors
-					trace("Lib not loaded, loading it");
-					trace($v{jniPackage} + " :: " + $v{jniPrimitive} 
-						+ ' :: signature '+$v{jniSignature});
-					#end
+					if ($i{fieldName} == null)
+					{
+						#if verbose_mirrors
+						trace("Lib not loaded, loading it");
+						trace($v{jniPackage} + " :: " + $v{jniPrimitive} 
+							+ ' :: signature '+$v{jniSignature});
+						#end
 
-					#if (openfl || nme)
-					if ($v{isStaticMethod})
-					{
-						$i{fieldName} = openfl.utils.JNI.createStaticMethod(
-							$v{jniPackage}, $v{jniPrimitive}, $v{jniSignature});
+						#if (openfl || nme)
+						if ($v{isStaticMethod})
+						{
+							$i{fieldName} = openfl.utils.JNI.createStaticMethod(
+								$v{jniPackage}, $v{jniPrimitive}, $v{jniSignature});
+						}
+						else
+						{
+							$i{fieldName} = openfl.utils.JNI.createMemberMethod(
+								$v{jniPackage}, $v{jniPrimitive}, $v{jniSignature});
+						}
+						#end
 					}
-					else
-					{
-						$i{fieldName} = openfl.utils.JNI.createMemberMethod(
-							$v{jniPackage}, $v{jniPrimitive}, $v{jniSignature});
-					}
-					#end
+				}
+				catch (exception:Dynamic)
+				{
+					trace(exception);
 				}
 				
 				$returnExpr;

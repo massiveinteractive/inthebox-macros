@@ -23,11 +23,33 @@ class FunctionTool
 		var params = func.ret.getParameters();
 		if (params[0].name == "Void")
 		{
-			expr = macro $i{name}($a{args});
+			expr = macro
+			{
+				try
+				{
+					$i{name}($a{args});
+				}
+				catch (exception:Dynamic)
+				{
+					trace(exception);
+				}
+			}
 		}
 		else
 		{
-			expr = macro return $i{name}($a{args});
+			expr = macro
+			{
+				var result:Dynamic = null;
+				try
+				{
+					result = $i{name}($a{args});
+				}
+				catch (exception:Dynamic)
+				{
+					trace(exception);
+				}
+				return result;
+			} 
 		}
 		
 		return expr;
